@@ -1,0 +1,421 @@
+import pandas as pd
+file=r'ur_path_name'
+nyc=pd.read_csv(file)
+nyc['last_review']=pd.to_datetime(nyc['last_review'], errors = 'coerce'
+
+#15 Найти все объявления, у которых number_of_reviews больше 100.
+nyc.query('number_of_reviews > 100')
+                               
+#16 Найти все объявления, у которых availability_365 равно 0.
+nyc.query('availability_365 == 0')
+
+#17 Найти все объявления, у которых availability_365 равно 365
+nyc.query('availability_365 == 365')
+                                  
+#18 Найти все объявления, у которых last_review пустой (NULL).
+nyc.query('last_review.isna()')
+                                  
+#19 Найти все объявления, у которых reviews_per_month пустой (NULL).
+nyc.query('reviews_per_month.isna()')
+                                  
+#20 Вывести все объявления, отсортированные по цене (price) по возрастанию.
+nyc.sort_values(by = 'price')
+                                  
+#21 Вывести все объявления, отсортированные по цене (price) по убыванию.
+nyc.sort_values(by = 'price')
+                                  
+#22 Вывести все объявления, отсортированные по количеству отзывов (number_of_reviews) по убыванию.
+nyc.sort_values(by = 'number_of_reviews', ascending = False)
+                                  
+#23 Вывести 20 самых дорогих объявлений
+nyc.nlargest(20, 'price')
+                                  
+#24 Вывести 20 самых дешевых объявлений.
+nyc.nsmallest (20, 'price')
+                                  
+#25 Вывести 10 объявлений с наибольшим количеством отзывов
+nyc.nlargest(10, 'number_of_reviews')
+                                  
+#26 Найти все объявления, в названии (name) которых есть слово 'Cozy'.
+nyc.query('name == "Cozy"')
+                                  
+#27 Найти все объявления, в названии которых есть слово 'Luxury'.
+nyc.query('name.str.contains("Luxury", case=False, na=False)', engine='python')
+                                  
+#28 Найти все объявления, в названии которых есть слово 'Apartment'
+nyc.query('name.str.contains("apartment", case = False, na = False)', engine = 'python')
+                                  
+#29 Найти все объявления, имя хоста (host_name) которых начинается на 'J'.
+nyc[nyc['host_name'].str.startswith(('J', 'j'), na=False)]
+                                  
+#30 Найти все объявления, у которых price находится в диапазоне от 100 до 200
+nyc.query('price >=100 and price <=200')
+                                  
+#43 Найти минимальную цену (price) в каждом neighbourhood_group.
+nyc.groupby('neighbourhood_group')['price'].min()
+                                  
+#44 Найти среднее количество ночей (minimum_nights) для каждого room_type.
+nyc.groupby('room_type')['minimum_nights'].mean()
+                                  
+#45 Посчитать суммарное количество отзывов (number_of_reviews) для каждого neighbourhood_group
+nyc.groupby('neighbourhood')['number_of_reviews'].sum()
+                                  
+#46 Посчитать среднее значение availability_365 для каждого neighbourhood_group.
+nyc.groupby('neighbourhood')['availability_365'].mean()
+                                  
+#47 Найти топ-5 районов (neighbourhood) по количеству объявлений
+nyc['neighbourhood'].value_counts().nlargest(5)
+                                  
+#48 Найти топ-5 хостов (host_name) по количеству объявлений.
+nyc['host_name'].value_counts().nlargest(5)
+                                  
+#49 Найти среднюю цену для объявлений с minimum_nights > 10.
+nyc.query('minimum_nights > 10')['price'].mean()
+                                  
+#50 Найти среднюю цену для объявлений с number_of_reviews > 50.
+nyc.query('number_of_reviews > 50')['price'].mean()
+                                  
+#51 Посчитать количество объявлений для каждого хоста (host_id) и вывести тех, у кого больше 5 объявлений.
+virok=nyc['host_id'].value_counts().reset_index(name = 'size')
+virok.query('size > 5')
+
+#52 Найти среднюю цену для каждого сочетания neighbourhood_group и room_type.
+nyc.pivot_table(index='neighbourhood_group', columns = 'room_type', values = 'price', aggfunc='mean')
+
+#53 Для каждого neighbourhood_group найти объявление с максимальной ценой
+virok = nyc.groupby('neighbourhood_group')['price'].transform('max')
+virok= nyc[nyc['price'] == virok]
+virok
+
+#54 Для каждого room_type найти среднее количество отзывов.
+nyc.groupby('room_type')['number_of_reviews'].mean()
+
+#55 Посчитать количество хостов, у которых только одно объявление.
+virok=nyc['host_id'].value_counts().reset_index(name = 'size')
+len(virok.query('size==1'))
+
+#56 Найти районы (neighbourhood), в которых средняя цена больше 200.
+virok=nyc.groupby('neighbourhood')[['price']].mean().reset_index()
+virok.query('price > 200')['neighbourhood']
+
+#63 Найти neighbourhood_group, где средняя доступность (availability_365) меньше 150.
+virok=nyc.groupby('neighbourhood_group')['availability_365'].mean()
+virok[virok>150]
+
+#67 Найти все объявления, цена которых выше средней цены по всему датасету.
+nyc['avg']=nyc['price'].mean()
+nyc.query('price>avg')
+
+#68 Найти все объявления, цена которых выше средней цены в их neighbourhood_group.
+nyc['avg']=nyc.groupby('neighbourhood_group')['price'].transform('mean')
+nyc[nyc['price']>nyc['avg']]
+
+#69 Найти все объявления, у которых цена равна максимальной цене в их neighbourhood.
+nyc['max']=nyc.groupby('neighbourhood')['price'].transform('max')
+nyc.query('price == max')
+
+#74 Пронумеровать все объявления в порядке убывания цены.
+nyc['rank']=nyc['price'].rank(method = 'dense', ascending = False)
+nyc.sort_values(by = 'rank')
+
+#78 Для каждого neighbourhood найти объявление с самой высокой ценой, используя RANK() или ROW_NUMBER().
+nyc['dense_rank']=nyc.groupby('neighbourhood')['price'].rank(method='dense', ascending = False)
+nyc.query('dense_rank == 1')
+
+#79 Посчитать накопительную сумму отзывов для объявлений, отсортированных по дате последнего отзыва (last_review)
+nyc.sort_values('last_review')
+nyc['summa']=nyc['number_of_reviews'].cumsum()
+nyc
+
+#82 Вывести все объявления, у которых last_review был в 2019 году.
+nyc['year']=nyc['last_review'].dt.year
+nyc.query('year==2019')
+
+#83 Вывести все объявления, у которых last_review был в июне.
+nyc['month']=nyc['last_review'].dt.month_name()
+nyc.query('month == "June"')
+
+#84 Посчитать количество объявлений для каждого года последнего отзыва.
+nyc['year']=nyc['last_review'].dt.year
+nyc.groupby('year').size()
+
+#87 Вывести имя хоста (host_name) в верхнем регистре.
+nyc['host_name'].str.upper()
+
+#88 Объединить neighbourhood_group и neighbourhood в одну строку через запятую.
+nyc['location']=nyc['neighbourhood_group'] + ', ' + nyc['neighbourhood']
+nyc
+
+#90 Заменить все вхождения слова 'Brooklyn' на 'BK' в названиях объявлений.
+nyc['name_replaced'] = nyc['name'].str.replace('Brooklyn', 'BK', regex=False)
+nyc
+
+#91 Извлечь первый символ из room_type
+nyc['room_type'].str[0]
+
+#92 Вывести объявления, у которых host_name состоит из одного слова.
+nyc['word_count'] = nyc['host_name'].str.split().str.len()
+nyc.query('word_count == 1')
+
+#101 Вывести объявления, цена которых выше средней цены по neighbourhood, но ниже средней по neighbourhood_group.
+nyc['avg_neighbourhood']=nyc.groupby('neighbourhood')['price'].transform('mean')
+nyc['avg_neighbourhood_group']=nyc.groupby('neighbourhood_group')['price'].transform('mean')
+nyc.query('price > avg_neighbourhood and price < avg_neighbourhood_group')
+
+#102 Найти корреляцию (если возможно) между price и number_of_reviews
+nyc['price'].corr(nyc['number_of_reviews'])
+
+#103 Найти 10 объявлений с самым длинным minimum_nights
+nyc.sort_values(by='minimum_nights', ascending = False).nlargest(10, 'minimum_nights')
+
+#104 Для каждого neighbourhood_group найти количество объявлений с minimum_nights = 1
+virok=nyc.query('minimum_nights == 1')
+virok['neighbourhood_group'].value_counts()
+
+#105 Найти объявления, которые не имеют отзывов и доступны 0 дней в году.
+nyc.query('number_of_reviews == 0 and availability_365 == 0')
+
+#108 Определить, в каком neighbourhood_group самая высокая конкуренция (больше всего хостов с >1 объявлением).
+virok=nyc.groupby(['neighbourhood_group', 'host_id']).size().reset_index(name='size')
+virok2=virok.query('size > 1')
+virok2.groupby('neighbourhood_group').size().sort_values(ascending=False)
+
+#109 Найти объявления, где price делится на 10 без остатка.
+nyc.query('price % 10 == 0')
+
+#110 Для каждого neighbourhood вывести количество уникальных хостов.
+nyc.groupby('neighbourhood')['host_id'].nunique()
+
+#111 Найти host_id, у которых все объявления имеют цену выше 200.
+nyc['min']=nyc.groupby('host_id')['price'].transform('min')
+nyc.query('min > 200')[['host_id', 'price']]
+
+#112 Вывести объявления, у которых reviews_per_month > 1 и number_of_reviews < 50 (аномалия).
+nyc.query('reviews_per_month > 1 and number_of_reviews < 50')
+
+#113 Найти среднюю разницу в цене между 'Entire home/apt' и 'Private room' в каждом neighbourhood_group.
+virok1=nyc.query('room_type == "Entire home/apt"')
+virok2=nyc.query('room_type == "Private room"')
+virok1=virok1.groupby('neighbourhood_group')['price'].mean().reset_index(name = 'avg1')
+virok2=virok2.groupby('neighbourhood_group')['price'].mean().reset_index(name = 'avg2')
+virok3=virok1.merge(virok2, on = 'neighbourhood_group')
+virok3['difference']=virok3['avg1']-virok3['avg2']
+virok3.rename(columns = {'avg1':'avg_of_home/apt', 'avg2':'avg_of_private'})
+
+#114 Вывести neighbourhood, в которых нет объявлений типа 'Shared room'
+nyc['true/false']=nyc['room_type']=='Shared room'
+nyc.groupby('neighbourhood')
+
+#115 Для каждого host_id найти дату его последнего отзыва (last_review)
+nyc.groupby('host_id')['last_review'].max()
+
+#117 Посчитать количество объявлений для каждого значения availability_365 и вывести топ-5 самых частых
+nyc['availability_365'].value_counts().head(5)
+
+#120 Вывести объявления, у которых latitude > 40.8 и longitude < -73.95.
+nyc.query('latitude > 40.8 and longitude < -73.95')
+
+#121 Какой район (neighbourhood) имеет самую высокую среднюю цену, но при этом менее 50 объявлений?
+nyc['mean']=nyc.groupby('neighbourhood')['price'].transform('mean')
+virok=nyc['neighbourhood'].value_counts().reset_index(name = 'count_neigh')
+virok2=virok.merge(nyc, on = 'neighbourhood')
+virok2=virok2[['neighbourhood', 'count_neigh', 'mean']]
+virok3=virok2.query('count_neigh < 50')
+max_avg=virok3['mean'].max()
+virok3.query('mean==@max_avg')
+
+#126 Найдите объявления, у которых цена изменилась бы, если бы вы добавили 10% к цене всех объявлений в 'Bronx'.
+nyc['new_price']=nyc['price']
+nyc.loc[nyc['neighbourhood_group'] == 'Bronx', 'new_price'] *= 1.1
+nyc[nyc['new_price']!=nyc['price']]
+
+#127 Определите "тихие" объявления: number_of_reviews < 5, но availability_365 > 300.
+nyc.query('number_of_reviews < 5 and availability_365 > 300')
+
+#128 Для каждого neighbourhood_group найдите объявление с самым длинным названием.
+nyc['name_len']=nyc['name'].str.len()
+virok=nyc.groupby('neighbourhood_group')['name_len'].idxmax()
+nyc.loc[virok]
+
+#130 Найдите объявления, где price * minimum_nights > 10000 (потенциальный доход).
+nyc['potencial_profit']=nyc['price']*nyc['minimum_nights']
+nyc[nyc['potencial_profit'] > 10000]
+
+#133 Выведите neighbourhood_group, для которых среднее reviews_per_month > 1.
+virok=nyc.groupby('neighbourhood_group')['reviews_per_month'].mean()
+virok[virok>1]
+
+#135 Для каждого room_type найдите объявление с максимальным calculated_host_listings_count.
+virok=nyc.groupby('room_type')['calculated_host_listings_count'].idxmax()
+nyc.loc[virok]
+
+#137 Найдите объявления, у которых latitude выше, чем у среднего объявления в их neighbourhood_group.
+nyc['mean']=nyc.groupby('neighbourhood_group')['latitude'].transform('mean')
+nyc.query('latitude > mean')[['latitude', 'mean']]
+
+#138 Выведите объявления, у которых price заканчивается на '9'.
+nyc.query('price % 10 ==9').head(100)
+
+#139 Для каждого neighbourhood_group посчитайте, сколько объявлений имеют ровно 0 отзывов
+virok=nyc.query('number_of_reviews==0')
+virok['neighbourhood_group'].value_counts().reset_index()
+
+#142 Выведите объявления, у которых minimum_nights > 30 и availability_365 < 100.
+nyc.query('minimum_nights > 30 and availability_365 < 100')
+
+#144 Найдите neighbourhood, где средняя цена 'Entire home/apt' самая высокая.
+nyc=nyc.query("room_type=='Entire home/apt'")
+nyc.groupby('neighbourhood')['price'].mean().nlargest(1).reset_index()
+
+#146 Найдите объявления, у которых number_of_reviews выше среднего, но reviews_per_month ниже среднего.
+nyc['mean_numb']=nyc['number_of_reviews'].mean()
+nyc['mean_review_per'] = nyc['reviews_per_month'].mean()
+nyc.query('number_of_reviews > mean_numb and reviews_per_month < mean_review_per')
+
+#149 Для каждого neighbourhood_group найдите количество объявлений на каждый room_type и отсортируйте по убыванию.
+nyc.groupby(['neighbourhood_group', 'room_type']).size().sort_values(ascending = False)
+
+#151 Выведите neighbourhood, у которых средняя цена выше, чем средняя цена по их neighbourhood_group.
+nyc['price_mean']=nyc.groupby('neighbourhood')['price'].transform('mean')
+nyc['price_mean_group']=nyc.groupby('neighbourhood_group')['price'].transform('mean')
+nyc.query('price_mean > price_mean_group')
+
+#154 Найдите объявления, у которых host_id встречается более 50 раз.
+virok=nyc['host_id'].value_counts()
+virok[virok>50]
+
+#156 Для каждого neighbourhood_group найдите объявление с наименьшим minimum_nights.
+virok=nyc.groupby('neighbourhood_group')['minimum_nights'].idxmin()
+nyc.loc[virok]
+
+#157 Найдите хостов, которые имеют объявления с availability_365 > 300 и number_of_reviews > 100.
+nyc.query('availability_365 > 300 and number_of_reviews > 100')['host_id']
+
+#159 Определите, есть ли хосты, у которых все объявления имеют 0 отзывов.
+virok=nyc.groupby('host_id')['number_of_reviews'].max().reset_index(name='max')
+virok.query('max == 0')['host_id']
+
+#160 Для каждого neighbourhood_group найдите хост с наибольшим calculated_host_listings_count.
+nyc['dense_rank']=nyc.groupby(['neighbourhood_group'])['calculated_host_listings_count'].rank(method='dense', ascending = False)
+nyc.query('dense_rank == 1')[['host_id', 'calculated_host_listings_count']]
+
+#161 Найдите объявления, у которых latitude и longitude совпадают с другими объявлениями (дубликаты по местоположению).
+nyc['count']=nyc.groupby(['latitude', 'longitude'])['host_id'].transform('count')
+nyc.query('count > 1')
+
+#163 Для каждого host_id найдите среднее количество отзывов на его объявления.
+nyc.groupby('host_id')['number_of_reviews'].mean()
+
+#165 Выведите объявления, у которых minimum_nights > 100.
+nyc.query('minimum_nights > 100')
+
+#166 Для каждого neighbourhood_group найдите объявление с самым длинным last_review (самый старый отзыв).
+virok=nyc.groupby('neighbourhood_group')['last_review'].idxmax()
+nyc.loc[virok]
+
+#168 Посчитайте, сколько объявлений имеют reviews_per_month > 5.
+len(nyc.query('reviews_per_month > 5'))
+
+#169 Выведите room_type, у которых максимальная цена выше 10000.
+virok=nyc.groupby('room_type')['price'].max().reset_index(name='max_pr')
+virok.query('max_pr > 10000')
+
+#171 Для каждого neighbourhood_group найдите объявление с самым коротким названием.
+nyc['name_len']=nyc['name'].str.len()
+nyc.groupby('neighbourhood_group')['name_len'].min()
+
+#172 Найдите хостов, у которых есть объявления с price = 0.
+nyc.query('price == 0')['host_id']
+
+#174 Для каждого room_type найдите объявление с наибольшим availability_365.
+virok=nyc.groupby('room_type')['availability_365'].idxmax()
+nyc.loc[virok]
+
+#175 Найдите объявления, у которых number_of_reviews > 100 и availability_365 < 10.
+nyc.query('number_of_reviews > 100 and availability_365 < 10')
+
+#178 Для каждого neighbourhood найдите среднее количество отзывов на объявление.
+nyc.groupby('neighbourhood')['number_of_reviews'].mean()
+
+#179 Найдите хостов, у которых есть объявления с minimum_nights = 365
+nyc.query('minimum_nights == 365')['host_id']
+
+#181 Выведите объявления, у которых price не изменился бы, если бы вы отняли 10.
+nyc['new_price']=nyc['price'] - 10
+nyc.query('price == new_price')
+
+#182 Для каждого neighbourhood_group найдите объявление с максимальным number_of_reviews.
+nyc.groupby('neighbourhood_group')['number_of_reviews'].max()
+
+#184 Выведите room_type, у которых средняя цена за ночь (price/minimum_nights) самая высокая.
+nyc['avg_night']=nyc['price']/nyc['minimum_nights']
+nyc.groupby('room_type')['avg_night'].mean()
+
+#186 Для каждого neighbourhood_group найдите количество объявлений с minimum_nights > 30.
+virok=nyc.query('minimum_nights > 30')
+virok['neighbourhood_group'].value_counts()
+
+#189 Для каждого room_type найдите объявление с самым длинным minimum_nights.
+nyc.groupby('room_type')['minimum_nights'].max()
+
+#190 Найдите объявления, у которых number_of_reviews = 0 и availability_365 = 365.
+nyc.query('number_of_reviews == 0 and availability_365 ==365')
+
+#193 Найдите хостов, у которых есть объявления с price > 1000.
+nyc.query('price>1000')['host_id']
+
+#194 Для каждого neighbourhood найдите объявление с максимальным calculated_host_listings_count.
+virok=nyc.groupby('neighbourhood')['calculated_host_listings_count'].idxmax()
+nyc.loc[virok]
+
+#195 Найдите объявления, у которых latitude больше 40.85.
+nyc.query('latitude > 40.85')
+
+#197 Для каждого neighbourhood_group найдите объявление с самым коротким minimum_nights
+nyc.groupby('neighbourhood_group')['minimum_nights'].min()
+
+#198 Найдите хостов, у которых есть объявления с availability_365 = 0.
+nyc.query('availability_365 ==0')['host_id']
+
+#200 Для каждого room_type найдите количество объявлений с price > 500.
+virok=nyc.query('price>500')
+virok.groupby('room_type').size()
+
+#202 Посчитайте, сколько хостов имеют объявления с price более 1000 и number_of_reviews более 100.
+len(nyc.query('price>1000 and number_of_reviews > 100')['host_id'].unique())
+
+#203 Выведите neighbourhood_group, где средняя цена для 'Entire home/apt' выше, чем для 'Private room' более чем на 100.
+virok=nyc.query('room_type == "Entire home/apt"')
+virok52=virok.groupby('neighbourhood_group')['price'].mean().reset_index(name='avg_entire')
+virok2=nyc.query('room_type == "Private room"')
+virok53=virok2.groupby('neighbourhood_group')['price'].mean().reset_index(name='avg_room')
+virok67=virok52.merge(virok53, on = 'neighbourhood_group')
+virok67.query('avg_entire - avg_room > 100')
+
+#204 Найдите объявления, у которых host_id совпадает, но host_name отличается.
+virok=nyc.groupby('host_id')['host_name'].nunique().reset_index(name='coconut')
+virok.query('coconut > 1')
+
+#205 Для каждого neighbourhood найдите объявление с максимальным number_of_reviews.
+nyc.groupby('neighbourhood')['number_of_reviews'].max()
+
+#207 Выведите room_type, у которых средняя доступность (availability_365) самая низкая.
+nyc.groupby('room_type')['availability_365'].mean()
+
+#209 Для каждого neighbourhood_group найдите объявление с самым старым last_review.
+virok=nyc.groupby('neighbourhood_group')['last_review'].idxmin()
+nyc.loc[virok]
+
+#210 Найдите хостов, у которых есть объявления с price < 50 и number_of_reviews > 100.
+nyc.query('price < 50 and number_of_reviews > 100')
+
+#212 Для каждого room_type найдите объявление с наибольшим calculated_host_listings_count.
+virok=nyc.groupby('room_type')['calculated_host_listings_count'].idxmax()
+nyc.loc[virok]
+
+#213 Найдите объявления, у которых name состоит только из одного слова.
+nyc['words']=nyc['name'].str.split().str.len()
+nyc
+
+#214 Посчитайте среднее количество отзывов для каждого host_id и выведите топ-10.
+nyc.groupby('host_id')['number_of_reviews'].mean().nlargest(10)
