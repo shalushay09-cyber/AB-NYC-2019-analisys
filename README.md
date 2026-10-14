@@ -4,7 +4,7 @@ Analysis of the "AB_NYC_2019" dataset using both SQL and Python, with a Power BI
 
 ## About
 
-This project analyses Airbnb listings in New York City (2019). I wrote each query in only one language — whichever was more convenient. Every task has different syntax in SQL and Python, so I chose the one that was faster or easier to read.
+I wrote each query in only one language — whichever was more convenient. Every task has different syntax in SQL and Python, so I chose the one that was faster or easier to read.
 
 ## Stack
 
